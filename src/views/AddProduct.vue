@@ -53,90 +53,89 @@
   </template>
   
   <script setup>
-import { ref, defineEmits, defineProps, watch } from "vue";
-
-const props = defineProps({
-  products: {
-    type: Array,
-    required: true,
-  },
-  editProduct: {
-    type: Object,
-    default: () => ({}),
-  },
-  isEditing: {
-    type: Boolean,
-    default: false,
-  },
-});
-
+  import { ref, defineEmits, defineProps, watch } from "vue";
+  
+  const props = defineProps({
+    products: {
+      type: Array,
+      required: true,
+    },
+    editProduct: {
+      type: Object,
+      default: () => ({}),
+    },
+    isEditing: {
+      type: Boolean,
+      default: false,
+    },
+  });
+  
+  
 const emit = defineEmits();
-const name = ref("");
-const image = ref("");
-const price = ref(0);
-const quantity = ref(0);
+const name = ref(props.isEditing ? props.editProduct.name : "");
+const image = ref(props.isEditing ? props.editProduct.image : "");
+const price = ref(props.isEditing ? props.editProduct.price : 0);
+const quantity = ref(props.isEditing ? props.editProduct.quantity : 0);
 const errors = ref({});
 
-// Theo dõi prop editProduct để cập nhật các trường dữ liệu
-watch(() => props.editProduct, (newVal) => {
-  if (newVal && Object.keys(newVal).length) {
-    name.value = newVal.name;
-    image.value = newVal.image;
-    price.value = newVal.price;
-    quantity.value = newVal.quantity;
+
+  watch(() => props.isEditing, (newValue) => {
+  if (newValue) {
+    name.value = props.editProduct.name;
+    image.value = props.editProduct.image;
+    price.value = props.editProduct.price;
+    quantity.value = props.editProduct.quantity;
   }
 });
-
-// Xử lý thêm hoặc cập nhật sản phẩm
-const handleAddProduct = () => {
-  errors.value = {}; // Reset errors
-
-  // Validate inputs
-  if (!name.value) {
-    errors.value.name = "This field is required.";
-  }
-  if (!image.value) {
-    errors.value.image = "This field is required.";
-  }
-  if (props.products.some(product => product.name === name.value && !props.isEditing)) {
-    errors.value.name = "Name already exists.";
-  }
-  if (price.value < 10000) {
-    errors.value.price = "Minimum price is 10,000 đ.";
-  }
-  if (quantity.value < 1 || quantity.value > 100) {
-    errors.value.quantity = "Quantity must be between 1 and 100.";
-  }
-
-  // If there are errors, don't proceed
-  if (Object.keys(errors.value).length) {
-    return;
-  }
-
-  const newProduct = {
-    name: name.value,
-    image: image.value,
-    price: price.value,
-    quantity: quantity.value,
+  
+  const handleAddProduct = () => {
+    errors.value = {};  
+  
+    // Validate 
+    if (!name.value) {
+      errors.value.name = "This field is required.";
+    }
+    if (!image.value) {
+      errors.value.image = "This field is required.";
+    }
+    if (props.products.some(product => product.name === name.value && !props.isEditing)) {
+      errors.value.name = "Name already exists.";
+    }
+    if (price.value < 10000) {
+      errors.value.price = "Minimum price is 10,000 đ.";
+    }
+    if (quantity.value < 1 || quantity.value > 100) {
+      errors.value.quantity = "Quantity must be between 1 and 100.";
+    }
+  
+    if (Object.keys(errors.value).length) {
+      return;
+    }
+  
+    const newProduct = {
+      name: name.value,
+      image: image.value,
+      price: price.value,
+      quantity: quantity.value,
+    };
+  
+    if (props.isEditing) {
+      emit("update-product", { index: props.editProductIndex, product: newProduct });
+    } else {
+      emit("add-product", newProduct);
+    }
+  
+    // Reset form
+    name.value = "";
+    image.value = "";
+    price.value = 0;
+    quantity.value = 0;
+  
+    emit("close");
   };
+  </script>
+  
 
-  if (props.isEditing) {
-    emit("update-product", { index: props.editProductIndex, product: newProduct });
-  } else {
-    emit("add-product", newProduct);
-  }
-
-  // Reset form
-  name.value = "";
-  image.value = "";
-  price.value = 0;
-  quantity.value = 0;
-
-  emit("close");
-};
-</script>
-
- 
   
   
      
@@ -159,7 +158,7 @@ const handleAddProduct = () => {
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    width: 400px; /* Fixed width for modal */
+    width: 400px;  
   }
   
   form {
@@ -182,16 +181,16 @@ const handleAddProduct = () => {
   }
   
   input:focus {
-    border-color: #007bff; /* Focus border color */
-    outline: none; /* Hide default outline */
+    border-color: #007bff;  
+    outline: none; 
   }
   
   .input-error {
-    border-color: red; /* Red border for error */
+    border-color: red;  
   }
   
   .error-message {
-    color: red; /* Red error message */
+    color: red; 
     font-size: 12px;
   }
   
@@ -211,21 +210,21 @@ const handleAddProduct = () => {
   }
   
   button[type='button'] {
-    background-color: #6c757d; /* Gray */
+    background-color: #6c757d; 
     color: white;
   }
   
   button[type='button']:hover {
-    background-color: #5a6268; /* Darker gray on hover */
+    background-color: #5a6268; 
   }
   
   button[type='submit'] {
-    background-color: #007bff; /* Blue */
+    background-color: #007bff; 
     color: white;
   }
   
   button[type='submit']:hover {
-    background-color: #0056b3; /* Darker blue on hover */
+    background-color: #0056b3;  
   }
   </style>
   

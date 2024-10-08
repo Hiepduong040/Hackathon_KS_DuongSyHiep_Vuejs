@@ -3,7 +3,7 @@
       <div class="container-header">
         <h2>Manager Product</h2>
         <button class="addProduct" @click="openAddModal">Add new product</button>
-        <input type="text" placeholder="Tìm kiếm sản phẩm" v-model="searchProduct" ref="myinput">
+        <input type="text" placeholder="Tìm kiếm sản phẩm" v-model="searchProduct" ref="myinput" />
       </div>
       <table>
         <thead>
@@ -38,7 +38,7 @@
             :products="products"
             @close="closeModal"
             @add-product="addProduct"
-            @update-product="updateProduct" 
+            @update-product="updateProduct"
             :edit-product="editProductData"
             :is-editing="isEditing"
           />
@@ -59,81 +59,92 @@
   </template>
   
   <script setup>
-import { ref, computed, onMounted, nextTick } from "vue";
-import AddProduct from "./AddProduct.vue";
-
-const products = ref(JSON.parse(localStorage.getItem("products")) || []);
-const showModal = ref(false);
-const showConfirmDeleteModal = ref(false);
-const currentIndex = ref(null);
-const editProductData = ref({});
-const isEditing = ref(false);
-const searchProduct = ref("");
-const myinput = ref(null);
-
-const filteredProducts = computed(() => {
-  if (!searchProduct.value) return products.value;
-  return products.value.filter(product =>
-    product.name.toLowerCase().includes(searchProduct.value.toLowerCase())
-  );
-});
-
-const closeModal = () => {
-  showModal.value = false;
-  isEditing.value = false;
-  editProductData.value = {};
-};
-
-const closeConfirmDeleteModal = () => {
-  showConfirmDeleteModal.value = false;
-};
-
-const addProduct = (newProduct) => {
-  products.value.push(newProduct);
-  localStorage.setItem("products", JSON.stringify(products.value));
-  closeModal();
-};
-
-const updateProduct = ({ index, product }) => {
-  products.value[index] = product;
-  localStorage.setItem("products", JSON.stringify(products.value));
-  closeModal();
-};
-
-const confirmDelete = (index) => {
-  currentIndex.value = index;
-  showConfirmDeleteModal.value = true;
-};
-
-const deleteProduct = (index) => {
-  products.value.splice(index, 1);
-  localStorage.setItem("products", JSON.stringify(products.value));
-  closeConfirmDeleteModal();
-};
-
-const openAddModal = () => {
-  showModal.value = true;
-  isEditing.value = false;
-  editProductData.value = {};
-};
-
-const openEditModal = (index) => {
-  editProductData.value = { ...products.value[index] };
-  currentIndex.value = index;
-  showModal.value = true;
-  isEditing.value = true;
-};
-
-// Focus vào input khi component được mount
-onMounted(() => {
-  nextTick(() => {
-    if (myinput.value) {
-      myinput.value.focus();
-    }
+  import { ref, computed, onMounted, nextTick } from "vue";
+  import AddProduct from "./AddProduct.vue";
+  
+  const products = ref(JSON.parse(localStorage.getItem("products")) || []);
+  const showModal = ref(false);
+  const showConfirmDeleteModal = ref(false);
+  const currentIndex = ref(null);
+  const editProductData = ref({});
+  const isEditing = ref(false);
+  const searchProduct = ref("");
+  const myinput = ref(null);
+  
+  const filteredProducts = computed(() => {
+    if (!searchProduct.value) return products.value;
+    return products.value.filter(product =>
+      product.name.toLowerCase().includes(searchProduct.value.toLowerCase())
+    );
   });
-});
-</script>
+  
+  const closeModal = () => {
+    showModal.value = false;
+    isEditing.value = false;
+    editProductData.value = {};
+  };
+  
+  const closeConfirmDeleteModal = () => {
+    showConfirmDeleteModal.value = false;
+  };
+  
+  const addProduct = (newProduct) => {
+    products.value.push(newProduct);
+    localStorage.setItem("products", JSON.stringify(products.value));
+    closeModal();
+  };
+  
+  const updateProduct = (updatedProduct) => {
+  const currentProduct = updatedProduct.product;
+  products.value[currentIndex.value] = {
+    ...currentProduct, // update thông tin sản phẩm
+  
+  };
+  console.log("currentProduct",currentProduct);
+  console.log("updatedProduct",updatedProduct);
+  
+  
+  localStorage.setItem("products", JSON.stringify(products.value)); // đẩy lên local
+  closeModal();
+};
 
+  
+
+  
+  const confirmDelete = (index) => {
+    currentIndex.value = index;
+    showConfirmDeleteModal.value = true;
+  };
+  
+  const deleteProduct = (index) => {
+    products.value.splice(index, 1);
+    localStorage.setItem("products", JSON.stringify(products.value));
+    closeConfirmDeleteModal();
+  };
+  
+  const openAddModal = () => {
+    showModal.value = true;
+    isEditing.value = false;
+    editProductData.value = {};
+  };
+  
+  const openEditModal = (index) => {
+    editProductData.value = { ...products.value[index] };
+    currentIndex.value = index;
+    showModal.value = true;
+    isEditing.value = true;
+  };
+  
+  // Focus vào ô input
+  onMounted(() => {
+    nextTick(() => {
+      if (myinput.value) {
+        myinput.value.focus();
+      }
+    });
+  });
+  </script>
+ 
   
 
   
